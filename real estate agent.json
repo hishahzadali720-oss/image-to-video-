@@ -1,0 +1,557 @@
+{
+  "name": "real estate agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        0
+      ],
+      "id": "b0112ddd-80ad-434c-be50-416c11ccc4e2",
+      "name": "When chat message received",
+      "webhookId": "2aac2759-fc29-49cd-8263-32e49797490b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9c52f545-697f-4122-aef3-5cff2ea84a6d",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "002411fb-7ac1-4381-a426-08dd9e82ba55",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=📅 Context\n\nFor reference, today is {{$now}}.\n\n🧰 Available Tools\n\n1. Update Database\nPurpose: Add or modify property, client, or transaction information.\nInput: Relevant record details.\n\n2. Book a Meeting\nPurpose: Schedule a 1-hour meeting at the specified date and time.\nInput: Date, time, and meeting notes.\n\n3. Client Search\nPurpose: Look up client information such as budget, contact, or interests.\nInput: Client name.\n\n4. Draft a Message\nPurpose: Write a concise, friendly, professional message to a selected recipient.\nInput: Message details.\n\n5. Calculator\nPurpose: Perform accurate calculations when necessary.\n\n✅ Response Rules\n\nAlways maintain a clear, professional tone.\n\nConfirm once each task is completed.\n\nOnly use the necessary tool when required.\n\nAlways ask for the user's Name, Email, and Mobile Number first.Save all the user details in a Google Sheet named \"Client Search\", including the user's name, email, mobile number, and property details."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "b3e58300-d50d-4c02-82bf-68b5b03db671",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        128
+      ],
+      "id": "9554f353-0e06-490a-962a-81d487c5d32d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TG9HVDEroa1B6vY0",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 500
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        128
+      ],
+      "id": "b5fd80a1-20be-4cce-9ab6-3fdede4116b1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        416
+      ],
+      "id": "ed47e76a-db77-40bd-b12d-2b449202f63f",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "TG9HVDEroa1B6vY0",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        416
+      ],
+      "id": "5e5ac67e-fa30-47c2-8def-3d13d15e9a7d",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        512
+      ],
+      "id": "95315bcb-c6c5-4a93-b92f-292676ef71c4",
+      "name": "Send a message in Gmail1",
+      "webhookId": "93e38d24-f701-42ef-aff3-28514220a267",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UuhMeGpXLpv5iqpO",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        128,
+        704
+      ],
+      "id": "0ce043b4-c3cd-4e52-a004-f5bfc03c372b",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "hishahzadali720@gmail.com",
+          "mode": "list",
+          "cachedResultName": "hishahzadali720@gmail.com"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        416
+      ],
+      "id": "b7f8d301-bf4d-4e99-9ca4-97342e99628c",
+      "name": "Book a Meeting",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "o2rDnqp2hT5O7IEQ",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        320
+      ],
+      "id": "7070bbfd-834d-477f-94cf-adedce8664eb",
+      "name": "Draft a Message",
+      "webhookId": "0c3f49de-511d-4d37-b391-5013cc51d215",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UuhMeGpXLpv5iqpO",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        560,
+        528
+      ],
+      "id": "a6acb2ae-3d24-49e1-b805-f874c0fba783",
+      "name": "Calculator2"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "hishahzadali720@gmail.com",
+          "mode": "list",
+          "cachedResultName": "hishahzadali720@gmail.com"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        608
+      ],
+      "id": "405c7680-6c5d-46f3-b29c-28a3a6ee582d",
+      "name": "Book a Meeting1",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "o2rDnqp2hT5O7IEQ",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a friendly, knowledgeable, and persuasive real estate assistant. Your goal is to help clients find the perfect property by answering their questions clearly, accurately, and engagingly. Always use the available tools to provide verified information about properties, listing agents, and availability.\nNever invent or assume details from outside sources.\n\n🧰 Tools\n\nProperty Q&A Tool:\nUse this tool to retrieve verified data about property details, pricing, location, listing agents, and availability. Summarize the most relevant information in a concise and helpful reply tailored to the user's query.\n\nNotify an Agent Tool:\nIf a user shows interest in a property, politely request their name and email address. Then, send an agent notification that includes:\n\nThe property the client is interested in\n\nThe client’s name\n\nThe client’s email\nThis ensures timely follow-up by the real estate agent.\n\nCalculator Tool:\nUse this tool to handle any numerical or financial calculations, such as mortgage estimates, price comparisons, or cost breakdowns.\n\n💡 Tone & Behavior\n\nBe polite, confident, and personable — like a trusted real estate consultant.\n\nUse natural, conversational language.\n\nWhen possible, make helpful suggestions (e.g., “Would you like me to check similar listings in that area?”).\n\nKeep replies concise but informative."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        240
+      ],
+      "id": "51ba6fe5-0456-4d03-88cf-3e4408d3a40a",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ",
+          "mode": "list",
+          "cachedResultName": "my n8n real estat agent ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "client ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        96
+      ],
+      "id": "5d121782-8461-463a-b8d8-bfd61edd5d53",
+      "name": "Client Search",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FsFZ86N4ET6RZ8YF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ",
+          "mode": "list",
+          "cachedResultName": "my n8n real estat agent ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 961669861,
+          "mode": "list",
+          "cachedResultName": "property ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ/edit#gid=961669861"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        208
+      ],
+      "id": "96cb8cbb-2007-4594-b2f3-e0f976d814ef",
+      "name": "Update Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FsFZ86N4ET6RZ8YF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ",
+          "mode": "list",
+          "cachedResultName": "my n8n real estat agent ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 961669861,
+          "mode": "list",
+          "cachedResultName": "property ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13WdJH4sRbe6hsSNNp5az_ROUYuOCmfWbx4i51SmoFgQ/edit#gid=961669861"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        128,
+        416
+      ],
+      "id": "069b21af-7c8a-4b21-a62f-69325a77aa41",
+      "name": "Update Database2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FsFZ86N4ET6RZ8YF",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book a Meeting": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft a Message": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book a Meeting1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Search": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Database": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Database2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8d9148ad-f5ef-4ef9-b220-25bed76e1f41",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "df73ba5bdfeea1a3140cef8a5b753a96624c5fa475e3c7a8aeb3305e6fc180a4"
+  },
+  "id": "RENTVKk5GG8T5XiG",
+  "tags": []
+}
