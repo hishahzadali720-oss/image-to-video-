@@ -1,0 +1,474 @@
+{
+  "name": "image to video",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "56e08794-d285-46e8-9d83-cf48bb16d444",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "84d7ed01-b894-47c7-ae8b-b320f5c8fd3d",
+      "name": "Webhook",
+      "webhookId": "56e08794-d285-46e8-9d83-cf48bb16d444"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload?key=652eefa96be7f27e6e15bcffa4eda742",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9bc74289-14db-486e-a527-e855b9fe099b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Let me know the content of the image, and specifically the main object.",
+        "imageUrls": "={{ $json.data.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ab36dbbe-1291-45fd-aae3-5b800d77e1db",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZAoaUOBn8HUmP4A4",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI ad creator specialized in making high‑converting but authentic ads.\n\nInput you will receive:\nProduct description*: `{{ $json['0'].content[0].text }}`\n(this explains what the product is, from the image)_\nOptional an ad idea:{{ $('Webhook').item.json.body.user_idea }}\n(may be empty)\n\nTask:\nCreate an organic, natural‑feeling ad concept around the product. The ad should feel like a genuine piece of content (tutorial, lifestyle, story, or recommendation) that people want to watch, while naturally highlighting the product’s benefits.\n\nImportant:*\nDo *not* just describe the product image.\n Always place the product in a real‑world context with people, settings, and storytelling.\nTailor pacing and flow to the aspect ratio (short, snappy for 9:16; more detailed for 16:9).\n\nOutput must include:\nAd Script* (full video flow)\nDescribe* how the video unfolds, scene by scene.*Guidelines Overview*\n- *Context*: Place product in a real‑world setting with people, settings, and storytelling.\n- *Aspect ratio*: Tailor pacing & flow – short/snappy for *9:16*, more detailed for *16:9*.\n\nOutput Requirements*\n Show the product’s natural introduction.\n Feel authentic (avoid salesy tone).\n\nThree Image Prompts*\n Detailed visual descriptions for AI image generation.\n Each prompt = a different key moment (person + background + product in context).\n\nThree Video Prompts* (linked to each image)\n Scene directions describing the short clip action.\nExample*: “A young woman pours coffee into a cup while sunlight streams through the window, then she picks up the product from the counter.”\n\n*Voiceover Script*\n- Conversational, natural language – like someone sharing or recommending.\n- Follow ad flow; highlight product benefits without sounding like a commercial announcer.\n- *Example Output Style* provided (though the actual text isn’t shown in the image).Sure thing! Here’s the extracted data from the image you shared:\n\nOverview\n- *Topic*: Guidelines for creating *3 Voiceover Scripts* for a video ad.\n- *Style*: Conversational, natural language – like someone sharing or recommending, *not* like a formal commercial announcer.\n- *Goal*: Follow the ad flow and highlight product benefits.\n\nExample Output Style\n- Provided example: “A young woman pours coffee into a cup while sunlight streams through the window, then she picks up the product from the counter.”\n\nSections Required\n1. *Image Descriptions*\n    1. [First image description]\n    2. [Second image description]\n    3. [Third image description]\n\n2. *Video Prompts*\n    1. [What happens in the video for image 1]\n    2. [What happens in the video for image 2]\n    3. [What happens in the video for image 3]\n\n3. *Voiceover*\n    1. [Exact words that the narrator or on‑screen person will say on *video 1*]\n    2. [Exact words that the narrator or on‑screen person will say on *video 2*]\n    3. [Exact words that the narrator or on‑screen person will say on *video 3*]\n\nL",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        224
+      ],
+      "id": "81ec9bbe-653e-4e9d-af68-f408307ac864",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        432
+      ],
+      "id": "7e941b71-970e-495a-ab02-5b84e1b26140",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZAoaUOBn8HUmP4A4",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        448
+      ],
+      "id": "1bae7777-fbca-4969-b7d1-b9796eaaa436",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Image Descriptions\": {\n    \"1\": \"A close-up shot of a luxurious rectangular perfume bottle with a golden liquid inside, placed against a warm beige background. The bottle has a glossy black cap and a gold neck, giving it an elegant and premium look.\",\n    \"2\": \"A man standing in his home garden holding the same perfume bottle. Soft sunlight filters through the plants, and the man looks relaxed, showcasing the product naturally.\",\n    \"3\": \"The man spraying the perfume on himself in the garden. A fine mist is visible in the air, with greenery and warm light creating a fresh, pleasant atmosphere.\"\n  },\n\n  \"Video Prompts\": {\n    \"1\": \"Slow cinematic movement around the perfume bottle. Camera rotates slightly while focusing on the glass reflections, golden liquid, and premium design.\",\n    \"2\": \"A medium shot of the man walking into his home garden holding the perfume bottle. Natural light highlights the bottle as he lifts it slightly toward the camera.\",\n    \"3\": \"The man sprays the perfume on himself, captured in slow motion. Mist floats in the air while the camera gently moves forward for an aesthetic, refreshing feel.\"\n  },\n\n  \"Voiceover\": {\n    \"1\": \"“Elegance, simplicity, and a scent that defines your presence. This is not just a perfume — it's an experience.”\",\n    \"2\": \"“Bring luxury into your everyday routine. A fragrance crafted to elevate every moment.”\",\n    \"3\": \"“Feel the freshness. Feel the confidence. One spray is all it takes to transform your day.”\"\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        448
+      ],
+      "id": "8d3fc84c-499f-4da7-9fcc-050efcff4682",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 2941cf7f7b442251e18b517475290e44"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"sora-2-image-to-video\",\n  \"callBackUrl\": \"https://your-domain.com/api/callback\",\n  \"input\": {\n    \"prompt\": \"{{ $json.output['Image Descriptions']['1'] }}\",\n    \"image_urls\": [\n      \"{{ $('HTTP Request').item.json.data.url }}\"\n    ],\n    \"aspect_ratio\": \"landscape\",\n    \"n_frames\": \"10\",\n    \"remove_watermark\": true\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        384,
+        224
+      ],
+      "id": "3a0f9ade-8d21-49ab-941e-a79a05b70f8a",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 2941cf7f7b442251e18b517475290e44"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        784,
+        224
+      ],
+      "id": "ec605c50-486d-488b-8ea2-86fdad9d9c47",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "amount": 80
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        224
+      ],
+      "id": "b27edfc6-71c7-4b26-9109-4c43084fba52",
+      "name": "Wait",
+      "webhookId": "8e60152f-5488-4b76-a8b9-de4c31ddba2c"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        992,
+        224
+      ],
+      "id": "9383e5a2-ba8f-4aed-817e-9253178a1b08",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "saqib236523652.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+            "content-length": "106002",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-US,en;q=0.9",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "103.251.254.102",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PK",
+            "cf-ray": "9a786c22e448ce41-SIN",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryFMu2F3793eypV6dH",
+            "origin": "https://ta-01kbepwnrdyhtx16jywjek06te-5173.wo-hksts3nxzdb0o7vclhon3bv7w.w.modal.host",
+            "priority": "u=1, i",
+            "referer": "https://ta-01kbepwnrdyhtx16jywjek06te-5173.wo-hksts3nxzdb0o7vclhon3bv7w.w.modal.host/",
+            "sec-ch-ua": "\"Chromium\";v=\"142\", \"Google Chrome\";v=\"142\", \"Not_A Brand\";v=\"99\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "103.251.254.102, 172.71.124.72",
+            "x-forwarded-host": "saqib236523652.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-92-7c777649cb-hph2q",
+            "x-is-trusted": "yes",
+            "x-real-ip": "103.251.254.102"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": "692e79093936190072694c0a",
+            "product_image_url": "https://base44.app/api/apps/692e72423d78395e465a2ff2/files/public/692e72423d78395e465a2ff2/ce116450c_pngegg.png",
+            "user_idea": "A man who has taken this perfume bottle to his home garden and is spraying it on himself.",
+            "type": "image",
+            "created_date": "2025-12-02T05:28:41.316945Z",
+            "created_by": "hishahzadali720@gmail.com"
+          },
+          "webhookUrl": "https://saqib236523652.app.n8n.cloud/webhook-test/56e08794-d285-46e8-9d83-cf48bb16d444",
+          "executionMode": "test"
+        },
+        "binary": {
+          "file": {
+            "mimeType": "image/png",
+            "fileType": "image",
+            "fileExtension": "png",
+            "data": "filesystem-v2",
+            "fileName": "pngegg.png",
+            "id": "filesystem-v2:workflows/lIJHkOYYN7GMh4bY/executions/temp/binary_data/3ad3e2b5-1a57-426b-9042-ffbe3e27a214",
+            "fileSize": "105 kB"
+          }
+        }
+      }
+    ],
+    "HTTP Request": [
+      {
+        "json": {
+          "data": {
+            "id": "pB7BVGR3",
+            "title": "pngegg",
+            "url_viewer": "https://ibb.co/pB7BVGR3",
+            "url": "https://i.ibb.co/0R7R48Ff/pngegg.png",
+            "display_url": "https://i.ibb.co/0R7R48Ff/pngegg.png",
+            "width": 579,
+            "height": 769,
+            "size": 104962,
+            "time": 1764653601,
+            "expiration": 0,
+            "image": {
+              "filename": "pngegg.png",
+              "name": "pngegg",
+              "mime": "image/png",
+              "extension": "png",
+              "url": "https://i.ibb.co/0R7R48Ff/pngegg.png"
+            },
+            "thumb": {
+              "filename": "pngegg.png",
+              "name": "pngegg",
+              "mime": "image/png",
+              "extension": "png",
+              "url": "https://i.ibb.co/pB7BVGR3/pngegg.png"
+            },
+            "delete_url": "https://ibb.co/pB7BVGR3/301e1c126192404fec2a1f0b6e6fa4f2"
+          },
+          "success": true,
+          "status": 200
+        }
+      }
+    ],
+    "Analyze image": [
+      {
+        "json": [
+          {
+            "id": "msg_0f3afc6d2e5a089600692e7adf80308196bb58c993bba1b47b",
+            "type": "message",
+            "status": "completed",
+            "content": [
+              {
+                "type": "output_text",
+                "annotations": [],
+                "logprobs": [],
+                "text": "The image features a perfume bottle. The main object is a rectangular glass bottle labeled \"TOM FORD OUD WOOD,\" which is an eau de parfum. The bottle is predominantly dark in color with a sleek and modern design."
+              }
+            ],
+            "role": "assistant"
+          }
+        ]
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0a45fdad-faaf-4a63-aa13-e18e93ccf28d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "297dabb65abcba55314d09552c87d7bc5a0d2d5cf6f3308845fb94262d9852ff"
+  },
+  "id": "lIJHkOYYN7GMh4bY",
+  "tags": []
+}
